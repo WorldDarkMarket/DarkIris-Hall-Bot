@@ -51,3 +51,20 @@ async def set_user_balance(message: types.Message):
         await message.answer(f"✅ Saldo de `{target_id}` atualizado para R$ {new_amount}", parse_mode="Markdown")
     except Exception as e:
         await message.answer("❌ Erro. Use: `/setbalance ID VALOR`")
+
+@router.callback_query(F.data == "view_history")
+async def view_history(callback: types.CallbackQuery):
+    from database.supabase_db import supabase
+    
+    # Busca as últimas 10 transações
+    res = supabase.table("transactions").select("*").eq("user_id", callback.from_user.id).order("created_at", desc=True).limit(10).execute()
+    
+    if not res.data:
+        return await callback.answer("📜 Você ainda não possui movimentações.", show_alert=True)
+    
+    msg = "📜 **HISTÓRICO DE CONTA**\n\n"
+    for t in res.data:
+        icon = "➕" if t['amount'] > 0 else "➖"
+        msg += f"{icon} R$ {abs(t['amount']):.2f} - {t['type']} ({t['created_at'][:10]})\n"
+        
+    await callback.message.answer(msg, parse_mode="Markdown")        

@@ -1,7 +1,15 @@
 import asyncio
+import sys
 from aiogram import Bot, Dispatcher
 from config import TOKEN
 from handlers import start, shopping, bank, darkmarket, darklabs
+
+async def main():
+    print(f"--- INICIANDO DARK IRIS HALL ---")
+    print(f"Python Version: {sys.version}")
+
+import asyncio
+
 
 async def main():
     bot = Bot(token=TOKEN)
